@@ -1,32 +1,32 @@
-# CANdb Studio
+# CAN Studio
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/candb-studio-logo.png" alt="CANdb Studio logo" width="350" />
+  <img src="https://raw.githubusercontent.com/parth-6/can-studio/main/resources/can-studio-logo.png" alt="CAN Studio logo" width="350" />
 </div>
 
 ## Introduction
 
-**CANdb Studio** is a [Visual Studio Code](https://code.visualstudio.com/) extension for working with **`.dbc`** (CAN database) files: structured editing, sidebar exploration, language features in the text editor, and optional bus monitoring and transmission when a compatible adapter is connected.
+**CAN Studio** is a [Visual Studio Code](https://code.visualstudio.com/) extension for working with **`.dbc`** (CAN database) files: structured editing, sidebar exploration, language features in the text editor, and optional bus monitoring and transmission when a compatible adapter is connected.
 
 | | |
 |--|--|
-| **Display name** | CANdb Studio |
-| **Package id** | `candb-studio` (Marketplace: `publisher.candb-studio`) |
+| **Display name** | CAN Studio |
+| **Package id** | `can-studio` (Marketplace: `publisher.can-studio`) |
 | **Scope** | CAN and DBC (`.dbc`) workflows. Other buses or formats (e.g. LIN/LDF, FlexRay, ARXML) are not supported. |
 
 > [!IMPORTANT]  
 > *Independent project; not affiliated with Vector Informatik or CANdb++.*
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/vid/overview_editor.gif)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/vid/overview_editor.gif)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/vid/overview_signal_lab.gif)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/vid/overview_signal_lab.gif)
 
 ### What this project is
 
-The repository builds the **`candb-studio`** extension. It includes:
+The repository builds the **`can-studio`** extension. It includes:
 
 - A **custom editor** (Svelte) for viewing and editing CAN databases.
-- A **CAN Database** explorer in the activity bar (**CANdb Studio** container).
+- A **CAN Database** explorer in the activity bar (**CAN Studio** container).
 - **Syntax highlighting** and language integration for `.dbc` files.
 - **Commands** to open databases, connect to a bus, run a monitor, and transmit frames (adapter-dependent).
 
@@ -53,14 +53,14 @@ If you work with CAN and DBC, the goal is simple: open a `.dbc`, understand stru
 
 ### Marketplace or `.vsix` (when published)
 
-1. In VS Code: **Extensions** → search **CANdb Studio**, or use **Install from VSIX…**.
+1. In VS Code: **Extensions** → search **CAN Studio**, or use **Install from VSIX…**.
 2. Reload the window if prompted.
 
 ### From source
 
 ```bash
-git clone https://github.com/afri-bit/vscode-canbus.git
-cd vscode-canbus
+git clone https://github.com/parth-6/can-studio.git
+cd can-studio
 
 npm install
 npm install --prefix webview-ui
@@ -74,11 +74,11 @@ Open this folder in VS Code and use **Run Extension** (F5), or run `npm run pack
 ### Editing
 
 - Open a `.dbc`. Choose **Open With…** → **CAN Database Editor** for the structured UI, or edit as plain text with DBC highlighting.
-- Use the **CANdb Studio** icon in the **activity bar**, then the **CAN Database** view to browse the tree for the active database context.
+- Use the **CAN Studio** icon in the **activity bar**, then the **CAN Database** view to browse the tree for the active database context.
 
 ### Commands
 
-Open the **Command Palette** (**View → Command Palette**). Commands are grouped under **CANdb Studio**, for example:
+Open the **Command Palette** (**View → Command Palette**). Commands are grouped under **CAN Studio**, for example:
 
 | Command | Purpose |
 |---------|---------|
@@ -108,7 +108,7 @@ The extension registers the **`dbc`** language for `*.dbc` files and ships a **T
 - **Activation**: Opening or focusing a `.dbc` file loads the language support.
 - **Custom editor**: For the full structured experience, use **CAN Database Editor** (see below); use **Text view** from that editor if you prefer the raw file in the default editor.
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_editor_text_00.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_editor_text_00.png)
 
 ### CAN Database Visual Editor
 
@@ -127,27 +127,27 @@ Opening a `.dbc` with **CAN Database Editor** loads the **Svelte**-based UI. It 
 - **Text view** — Opens the same file in the **default text editor** for hand-editing raw DBC.
 - **Save** — Writes the serialized database back to the `.dbc` file.
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_editor_message_01.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_editor_message_01.png)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_editor_message_02.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_editor_message_02.png)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_editor_signal_01.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_editor_signal_01.png)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_editor_architecture_01.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_editor_architecture_01.png)
 
 ### CAN Database Explorer
 
-In the **activity bar**, open **CANdb Studio** → **CAN Database**. This **tree view** shows the **active database for bus decode** — the same session you pick in CAN Signal Lab. If you unlink decode there, the sidebar tree empties until you select another loaded `.dbc`. Top level: **nodes**, **messages** (expand a message for per-frame layout), **signals** (full global pool, A–Z), then **unlinked signals** (pool entries not on any frame).
+In the **activity bar**, open **CAN Studio** → **CAN Database**. This **tree view** shows the **active database for bus decode** — the same session you pick in CAN Signal Lab. If you unlink decode there, the sidebar tree empties until you select another loaded `.dbc`. Top level: **nodes**, **messages** (expand a message for per-frame layout), **signals** (full global pool, A–Z), then **unlinked signals** (pool entries not on any frame).
 
 Use it when you want a compact sidebar overview without opening the full custom editor, or alongside other editors.
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_signal_lab_01.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_signal_lab_01.png)
 
 ### CAN Signal Lab
 
 **Signal Lab** combines monitoring, transmit, and charts in one place.
 
-- **Open**: Command **CANdb Studio: Open CAN Signal Lab**, status bar shortcuts where provided, or the full editor-area **CAN Signal Lab** panel.
+- **Open**: Command **CAN Studio: Open CAN Signal Lab**, status bar shortcuts where provided, or the full editor-area **CAN Signal Lab** panel.
 - **Panels**:
   - **Monitor** — Live frame list when a bus connection and monitor are active; decoding uses the loaded database when a session is attached.
   - **Transmit** — Build and send frames from **message definitions** in the loaded `.dbc` (ID, DLC, signal layout). Requires a loaded database and a working connection path.
@@ -157,15 +157,15 @@ If no database is attached for decoding, traffic may appear as **raw IDs and pay
 
 The screenshots below follow the **Monitor → Transmit → Charts** layout described above: first the **Monitor** tab (frame log, live signals, then raw IDs), then **Transmit**, then **Charts** (virtual bus).
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_signal_lab_04.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_signal_lab_04.png)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_signal_lab_05.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_signal_lab_05.png)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_signal_lab_06.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_signal_lab_06.png)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_signal_lab_03.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_signal_lab_03.png)
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_signal_lab_02.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_signal_lab_02.png)
 
 ### Bus Connection
 
@@ -182,7 +182,7 @@ Adapter support is **pluggable in code** but **hardware-specific** in practice: 
 >
 > **DBC decode/encode:** Intel (little-endian) layout is covered by tests. **Motorola (big-endian)** is still a **stub**—do not rely on correct physical values for Motorola signals in this release.
 
-![](https://raw.githubusercontent.com/afri-bit/candb-studio/main/resources/img/doc_signal_lab_07.png)
+![](https://raw.githubusercontent.com/parth-6/can-studio/main/resources/img/doc_signal_lab_07.png)
 
 ## Upcoming Features
 
@@ -214,4 +214,4 @@ Demonstration recordings can be captured with tools such as [Chronicler](https:/
 
 This project is licensed under the **MIT License**. See [LICENSE](LICENSE).
 
-Copyright (c) 2026 afri-bit.
+Copyright (c) 2026 parth-6.

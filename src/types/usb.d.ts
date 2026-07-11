@@ -51,6 +51,5 @@ declare module 'usb' {
         findByIds: (vid: number, pid: number) => Device | undefined;
     };
 
-    export = USB;
     export { USB, getDeviceList, findByIds };
 }

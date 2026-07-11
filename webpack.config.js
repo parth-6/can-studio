@@ -44,6 +44,10 @@ const extensionConfig = {
           },
         ],
       },
+      {
+        test: /\.node$/,
+        use: 'node-loader',
+      },
     ],
   },
   devtool: 'nosources-source-map',

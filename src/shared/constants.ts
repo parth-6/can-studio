@@ -1,5 +1,5 @@
 /** Extension identifier. */
-export const EXTENSION_ID = 'candb-studio';
+export const EXTENSION_ID = 'can-studio';
 
 /** DBC language identifier for VS Code language features. */
 export const DBC_LANGUAGE_ID = 'dbc';

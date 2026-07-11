@@ -965,7 +965,7 @@ export class WebviewMessageHandler {
     }
 
     private getWebviewSettings(): { showOverallView: boolean } {
-        const cfg = vscode.workspace.getConfiguration('candb-studio');
+        const cfg = vscode.workspace.getConfiguration('can-studio');
         return { showOverallView: cfg.get<boolean>('explorer.showOverallView', true) };
     }
 

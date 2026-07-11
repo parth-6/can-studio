@@ -9,68 +9,68 @@ suite('Extension Integration', () => {
   suiteSetup(async () => {
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
     const ext =
-      vscode.extensions.getExtension('undefined_publisher.candb-studio') ??
-      vscode.extensions.all.find((e) => e.id.includes('candb-studio'));
+      vscode.extensions.getExtension('can-studio') ??
+      vscode.extensions.all.find((e) => e.id.includes('can-studio'));
     await ext?.activate();
   });
 
   suite('activation', () => {
     test('extension is present in the extension list', () => {
-      const ext = vscode.extensions.getExtension('undefined_publisher.candb-studio');
+      const ext = vscode.extensions.getExtension('can-studio');
       // During development the publisher may not be set; check for the extension name fallback.
       // TODO: Update publisher name once package.json is finalized.
       assert.ok(
-        ext !== undefined || vscode.extensions.all.some(e => e.id.includes('candb-studio')),
+        ext !== undefined || vscode.extensions.all.some(e => e.id.includes('can-studio')),
         'Extension should be discoverable',
       );
     });
   });
 
   suite('commands', () => {
-    test('candb-studio.openDatabase command is registered', async () => {
+    test('can-studio.openDatabase command is registered', async () => {
       const commands = await vscode.commands.getCommands(true);
       assert.ok(
-        commands.includes('candb-studio.openDatabase'),
+        commands.includes('can-studio.openDatabase'),
         'openDatabase command should be registered',
       );
     });
 
-    test('candb-studio.connectBus command is registered', async () => {
+    test('can-studio.connectBus command is registered', async () => {
       const commands = await vscode.commands.getCommands(true);
       assert.ok(
-        commands.includes('candb-studio.connectBus'),
+        commands.includes('can-studio.connectBus'),
         'connectBus command should be registered',
       );
     });
 
-    test('candb-studio.disconnectBus command is registered', async () => {
+    test('can-studio.disconnectBus command is registered', async () => {
       const commands = await vscode.commands.getCommands(true);
       assert.ok(
-        commands.includes('candb-studio.disconnectBus'),
+        commands.includes('can-studio.disconnectBus'),
         'disconnectBus command should be registered',
       );
     });
 
-    test('candb-studio.startMonitor command is registered', async () => {
+    test('can-studio.startMonitor command is registered', async () => {
       const commands = await vscode.commands.getCommands(true);
       assert.ok(
-        commands.includes('candb-studio.startMonitor'),
+        commands.includes('can-studio.startMonitor'),
         'startMonitor command should be registered',
       );
     });
 
-    test('candb-studio.stopMonitor command is registered', async () => {
+    test('can-studio.stopMonitor command is registered', async () => {
       const commands = await vscode.commands.getCommands(true);
       assert.ok(
-        commands.includes('candb-studio.stopMonitor'),
+        commands.includes('can-studio.stopMonitor'),
         'stopMonitor command should be registered',
       );
     });
 
-    test('candb-studio.openSignalLab command is registered', async () => {
+    test('can-studio.openSignalLab command is registered', async () => {
       const commands = await vscode.commands.getCommands(true);
       assert.ok(
-        commands.includes('candb-studio.openSignalLab'),
+        commands.includes('can-studio.openSignalLab'),
         'openSignalLab command should be registered',
       );
     });

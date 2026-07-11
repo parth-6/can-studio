@@ -1,20 +1,20 @@
 {
-  "name": "candb-studio",
-  "displayName": "CANdb Studio",
+  "name": "can-studio",
+  "displayName": "CAN Studio",
   "description": "CAN database editor and bus connectivity tools for VS Code",
   "version": "0.2.0",
   "publisher": "afri-bit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/afri-bit/candb-studio.git"
+    "url": "https://github.com/parth-6/can-studio.git"
   },
   "engines": {
     "vscode": "^1.110.0"
   },
   "bugs": {
-    "url": "https://github.com/afri-bit/candb-studio/issues"
+    "url": "https://github.com/parth-6/can-studio/issues"
   },
-  "homepage": "https://github.com/afri-bit/candb-studio",
+  "homepage": "https://github.com/parth-6/can-studio",
   "keywords": [
     "dbc",
     "can",
@@ -37,7 +37,7 @@
     "Programming Languages",
     "Other"
   ],
-  "icon": "resources/candb-studio-logo.png",
+  "icon": "resources/can-studio-logo.png",
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
@@ -61,9 +61,9 @@
     ],
     "customEditors": [
       {
-        "viewType": "candb-studio.canDatabaseEditor",
+        "viewType": "can-studio.canDatabaseEditor",
         "displayName": "CAN Database Editor",
-        "icon": "resources/candb-studio-icon.png",
+        "icon": "resources/can-studio-icon.png",
         "selector": [
           {
             "filenamePattern": "*.dbc"
@@ -76,65 +76,65 @@
       "activitybar": [
         {
           "id": "canbus-explorer",
-          "title": "CANdb Studio",
-          "icon": "resources/candb-studio-icon.png"
+          "title": "CAN Studio",
+          "icon": "resources/can-studio-icon.png"
         }
       ]
     },
     "views": {
       "canbus-explorer": [
         {
-          "id": "candb-studio.canDatabaseExplorer",
+          "id": "can-studio.canDatabaseExplorer",
           "name": "CAN Database"
         }
       ]
     },
     "commands": [
       {
-        "command": "candb-studio.openDatabase",
+        "command": "can-studio.openDatabase",
         "title": "Open CAN Database",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       },
       {
-        "command": "candb-studio.openSignalLab",
+        "command": "can-studio.openSignalLab",
         "title": "Open CAN Signal Lab",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       },
       {
-        "command": "candb-studio.closeSignalLab",
+        "command": "can-studio.closeSignalLab",
         "title": "Close CAN Signal Lab…",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       },
       {
-        "command": "candb-studio.connectBus",
+        "command": "can-studio.connectBus",
         "title": "Connect to CAN Bus",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       },
       {
-        "command": "candb-studio.disconnectBus",
+        "command": "can-studio.disconnectBus",
         "title": "Disconnect from CAN Bus",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       },
       {
-        "command": "candb-studio.startMonitor",
+        "command": "can-studio.startMonitor",
         "title": "Start CAN Monitor",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       },
       {
-        "command": "candb-studio.stopMonitor",
+        "command": "can-studio.stopMonitor",
         "title": "Stop CAN Monitor",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       },
       {
-        "command": "candb-studio.transmitMessage",
+        "command": "can-studio.transmitMessage",
         "title": "Transmit CAN Message",
-        "category": "CANdb Studio"
+        "category": "CAN Studio"
       }
     ],
     "configuration": {
-      "title": "CANdb Studio",
+      "title": "CAN Studio",
       "properties": {
-        "candb-studio.explorer.showOverallView": {
+        "can-studio.explorer.showOverallView": {
           "type": "boolean",
           "default": false,
           "description": "Show the Overall View sidebar in the DBC editor by default."
@@ -172,6 +172,7 @@
     "electron": "^42.2.0",
     "eslint": "^9.39.2",
     "mocha": "^11.3.0",
+    "node-loader": "^2.1.0",
     "prettier": "^3.8.1",
     "prettier-plugin-svelte": "^3.5.1",
     "ts-loader": "^9.5.4",

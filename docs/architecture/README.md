@@ -1,6 +1,6 @@
 # Architecture documentation (deep dive)
 
-This folder breaks down the **candb-studio** extension host (`src/`) in smaller, navigable pieces. Start here, then read the numbered guides in order.
+This folder breaks down the **can-studio** extension host (`src/`) in smaller, navigable pieces. Start here, then read the numbered guides in order.
 
 | Doc | Contents |
 |-----|----------|

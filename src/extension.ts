@@ -25,7 +25,7 @@ import { ConnectionStatusBar } from './presentation/statusbar/ConnectionStatusBa
 import { SignalLabStatusBar } from './presentation/statusbar/SignalLabStatusBar';
 import { CanDatabaseTreeProvider } from './presentation/views/treeview/CanDatabaseTreeProvider';
 // Signal Lab sidebar tree off. Re-enable: package.json → activationEvents add
-// "onView:candb-studio.signalLabSidebar"; contributes.views.canbus-explorer add the Signal Lab view object;
+// "onView:can-studio.signalLabSidebar"; contributes.views.canbus-explorer add the Signal Lab view object;
 // then uncomment import, register block, and signalLabTreeProvider.refresh() below.
 // import { SignalLabSidebarTreeProvider } from './presentation/views/treeview/SignalLabSidebarTreeProvider';
 import { WebviewMessageHandler } from './presentation/webview/WebviewMessageHandler';
@@ -44,7 +44,7 @@ import { Commands } from './shared/constants';
  */
 export function activate(context: vscode.ExtensionContext): void {
     Logger.initialize();
-    Logger.info('Activating candb-studio extension');
+    Logger.info('Activating can-studio extension');
 
     // ── Shared cross-cutting infrastructure ────────────────────────────────
     const eventBus = new EventBus();
@@ -217,12 +217,12 @@ export function activate(context: vscode.ExtensionContext): void {
         ),
     );
 
-    Logger.info('candb-studio extension activated');
+    Logger.info('can-studio extension activated');
 }
 
 /**
  * Called when the extension is deactivated; currently logs only (subscriptions dispose with the context).
  */
 export function deactivate(): void {
-    Logger.info('candb-studio extension deactivated');
+    Logger.info('can-studio extension deactivated');
 }

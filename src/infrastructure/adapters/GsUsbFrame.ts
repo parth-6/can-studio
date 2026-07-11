@@ -6,6 +6,7 @@ import {
     GS_USB_CAN_FLAG_BRS,
     GS_USB_CAN_FLAG_ESI,
     GsUsbHostFrameHeader,
+    GsUsbDeviceConfig,
 } from './GsUsbConstants';
 
 /**
@@ -202,16 +203,15 @@ export function buildHostFormatPayload(littleEndian: boolean): Buffer {
 /**
  * Parse device config response
  */
-export function parseDeviceConfig(data: Buffer): {
-    nchannels: number;
-    swVersion: number;
-    hwVersion: number;
-} | null {
+export function parseDeviceConfig(data: Buffer): GsUsbDeviceConfig | null {
     if (data.length < 64) return null;
     return {
-        nchannels: data.readUInt8(4) + 1, // nchannels is (n-1)
-        swVersion: data.readUInt32LE(8),
-        hwVersion: data.readUInt32LE(12),
+        reserved1: data.readUInt32LE(0),
+        reserved2: data.readUInt32LE(4),
+        reserved3: data.readUInt32LE(8),
+        nchannels: data.readUInt8(12) + 1, // nchannels is (n-1)
+        swVersion: data.readUInt32LE(16),
+        hwVersion: data.readUInt32LE(20),
     };
 }
 

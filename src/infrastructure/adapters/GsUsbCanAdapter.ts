@@ -6,7 +6,7 @@ import type { Disposable } from '../../core/types';
 import { ConnectionError } from '../../shared/errors/ConnectionError';
 import { Logger } from '../../shared/utils/Logger';
 // @ts-ignore - usb package types are incomplete
-import USB from 'usb';
+import USB, { Device } from 'usb';
 import {
     GS_USB_VID,
     GS_USB_PID,
@@ -64,7 +64,7 @@ import type { CanId } from '../../core/types';
  */
 export class GsUsbCanAdapter implements ICanBusAdapter {
     private _state: CanBusState = CanBusState.Disconnected;
-    private device: USB | null = null;
+    private device: Device | null = null;
     private interfaceNumber = 0;
     private channel = 0;
     private echoIdCounter = 0;
@@ -176,7 +176,7 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
         ), this.channel);
 
         // 6. Set CAN FD data bit timing if dataBitrate provided
-        if (dataBitrate && this.btConstExt?.feature & 0x100) { // FD feature supported
+        if (dataBitrate && ((this.btConstExt?.feature ?? 0) & 0x100)) { // FD feature supported
             const fdBittiming = this.calculateBittiming(dataBitrate, true);
             await this.controlTransferOut(GS_USB_REQUEST_DATA_BITTIMING, buildDataBittimingPayload(
                 fdBittiming.propSeg,
@@ -246,7 +246,7 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
                     wIndex: this.interfaceNumber,
                 },
                 data,
-                (err) => {
+                (err: Error | null) => {
                     if (err) {
                         reject(new ConnectionError(`Control transfer OUT failed: ${err.message}`, 'gs_usb'));
                     } else {
@@ -269,7 +269,7 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
                     wIndex: this.interfaceNumber,
                 },
                 length,
-                (err, data) => {
+                (err: Error | null, data: Buffer) => {
                     if (err) {
                         reject(new ConnectionError(`Control transfer IN failed: ${err.message}`, 'gs_usb'));
                     } else {
@@ -316,7 +316,7 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
         if (!this.device) throw new ConnectionError('Device not opened', 'gs_usb');
 
         return new Promise((resolve, reject) => {
-            this.device!.transferIn(endpoint, length, (err, data) => {
+            this.device!.transferIn(endpoint, length, (err: Error | null, data: Buffer) => {
                 if (err) {
                     reject(new ConnectionError(`Bulk transfer IN failed: ${err.message}`, 'gs_usb'));
                 } else {
@@ -330,7 +330,7 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
         if (!this.device) throw new ConnectionError('Device not opened', 'gs_usb');
 
         return new Promise((resolve, reject) => {
-            this.device!.transferOut(endpoint, data, (err) => {
+            this.device!.transferOut(endpoint, data, (err: Error | null) => {
                 if (err) {
                     reject(new ConnectionError(`Bulk transfer OUT failed: ${err.message}`, 'gs_usb'));
                 } else {

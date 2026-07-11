@@ -1,9 +1,9 @@
 ---
-name: candb-studio-development
-description: Builds, layout, and workflows for the candb-studio repo — extension host vs webview, compile steps, and where to change behavior. Use when implementing features, debugging the custom editor, or navigating src/ and webview-ui/.
+name: can-studio-development
+description: Builds, layout, and workflows for the can-studio repo — extension host vs webview, compile steps, and where to change behavior. Use when implementing features, debugging the custom editor, or navigating src/ and webview-ui/.
 ---
 
-# candb-studio development
+# can-studio development
 
 ## Build
 - **Full compile**: `npm run compile` — runs `build:webview` (Vite) then webpack for `dist/extension.js`.
