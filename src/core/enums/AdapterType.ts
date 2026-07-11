@@ -5,4 +5,5 @@ export enum AdapterType {
     PCAN = 'pcan',
     Vector = 'vector',
     Virtual = 'virtual',
+    GsUsb = 'gs_usb',
 }

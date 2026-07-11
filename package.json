@@ -38,12 +38,6 @@
     "Other"
   ],
   "icon": "resources/candb-studio-logo.png",
-  "activationEvents": [
-    "onLanguage:dbc",
-    "onCustomEditor:candb-studio.canDatabaseEditor",
-    "onCommand:candb-studio.openSignalLab",
-    "onCommand:candb-studio.closeSignalLab"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [
@@ -167,13 +161,15 @@
     "test:integration": "npm run compile && npm run compile-tests && cross-env VSCODE_TEST_FILES=out/test/integration/**/*.test.js vscode-test"
   },
   "devDependencies": {
-    "@vscode/vsce": "^3.7.1",
+    "@electron/rebuild": "^4.2.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@types/vscode": "^1.110.0",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.7.1",
     "cross-env": "^7.0.3",
+    "electron": "^42.2.0",
     "eslint": "^9.39.2",
     "mocha": "^11.3.0",
     "prettier": "^3.8.1",
@@ -183,5 +179,12 @@
     "typescript-eslint": "^8.54.0",
     "webpack": "^5.104.1",
     "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@serialport/bindings": "^10.0.1",
+    "@types/serialport": "^8.0.5",
+    "@types/usb": "^2.0.4",
+    "serialport": "^9.2.8",
+    "usb": "^3.0.1"
   }
 }

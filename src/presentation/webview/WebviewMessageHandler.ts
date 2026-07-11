@@ -17,6 +17,8 @@ import type { CanDatabase } from '../../core/models/database/CanDatabase';
 import { Message } from '../../core/models/database/Message';
 import { Node } from '../../core/models/database/Node';
 import { SocketCanAdapter } from '../../infrastructure/adapters/SocketCanAdapter';
+import { SLCANCanAdapter } from '../../infrastructure/adapters/SLCANCanAdapter';
+import { GsUsbCanAdapter } from '../../infrastructure/adapters/GsUsbCanAdapter';
 import { VirtualCanAdapter } from '../../infrastructure/adapters/VirtualCanAdapter';
 import type { ConnectBusCommand } from '../commands/ConnectBusCommand';
 import { Commands, DEFAULT_BITRATE } from '../../shared/constants';
@@ -155,6 +157,12 @@ export class WebviewMessageHandler {
         }
         if (a instanceof SocketCanAdapter) {
             return AdapterType.SocketCAN;
+        }
+        if (a instanceof SLCANCanAdapter) {
+            return AdapterType.SLCAN;
+        }
+        if (a instanceof GsUsbCanAdapter) {
+            return AdapterType.GsUsb;
         }
         return undefined;
     }

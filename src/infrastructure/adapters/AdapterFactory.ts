@@ -1,6 +1,8 @@
 import { AdapterType } from '../../core/enums/AdapterType';
 import type { ICanBusAdapter } from '../../core/interfaces/bus/ICanBusAdapter';
 import { SocketCanAdapter } from './SocketCanAdapter';
+import { SLCANCanAdapter } from './SLCANCanAdapter';
+import { GsUsbCanAdapter } from './GsUsbCanAdapter';
 import { VirtualCanAdapter } from './VirtualCanAdapter';
 
 /**
@@ -11,6 +13,8 @@ import { VirtualCanAdapter } from './VirtualCanAdapter';
 export class AdapterFactory {
     private static readonly registry = new Map<AdapterType, () => ICanBusAdapter>([
         [AdapterType.SocketCAN, () => new SocketCanAdapter()],
+        [AdapterType.SLCAN, () => new SLCANCanAdapter()],
+        [AdapterType.GsUsb, () => new GsUsbCanAdapter()],
         [AdapterType.Virtual, () => new VirtualCanAdapter()],
     ]);
 

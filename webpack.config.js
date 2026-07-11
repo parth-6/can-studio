@@ -20,6 +20,8 @@ const extensionConfig = {
   },
   externals: {
     vscode: 'commonjs vscode',
+    serialport: 'commonjs serialport',
+    '@serialport/bindings': 'commonjs @serialport/bindings',
   },
   resolve: {
     extensions: ['.ts', '.js'],

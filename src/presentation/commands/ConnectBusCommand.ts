@@ -6,6 +6,8 @@ import type { ICanBusAdapter } from '../../core/interfaces/bus/ICanBusAdapter';
 import { CanChannel } from '../../core/models/bus/CanChannel';
 import { AdapterFactory } from '../../infrastructure/adapters/AdapterFactory';
 import { SocketCanAdapter } from '../../infrastructure/adapters/SocketCanAdapter';
+import { SLCANCanAdapter } from '../../infrastructure/adapters/SLCANCanAdapter';
+import { GsUsbCanAdapter } from '../../infrastructure/adapters/GsUsbCanAdapter';
 import { VirtualCanAdapter } from '../../infrastructure/adapters/VirtualCanAdapter';
 import { Commands, DEFAULT_BITRATE } from '../../shared/constants';
 import type { EventBus } from '../../shared/events/EventBus';
@@ -139,11 +141,17 @@ export class ConnectBusCommand {
         }
 
         const isVirtual = selected.adapterType === AdapterType.Virtual;
+        const isSLCAN = selected.adapterType === AdapterType.SLCAN;
+        const isGsUsb = selected.adapterType === AdapterType.GsUsb;
         const channelName = await vscode.window.showInputBox({
             prompt: isVirtual
                 ? 'Channel label (optional). Virtual mode is in-process software loopback only — no physical adapter or system CAN device.'
+                : isSLCAN
+                ? 'Enter COM port (e.g. COM3 on Windows, /dev/ttyUSB0 on Linux).'
+                : isGsUsb
+                ? 'Select CANnectivity device (will auto-detect available devices).'
                 : 'Enter SocketCAN interface name (e.g. can0 or vcan0).',
-            value: isVirtual ? 'virtual-loopback' : 'can0',
+            value: isVirtual ? 'virtual-loopback' : isSLCAN ? 'COM3' : isGsUsb ? 'auto' : 'can0',
         });
 
         if (!channelName) {
@@ -167,10 +175,17 @@ export class ConnectBusCommand {
         const existing = this.adapter;
         if (existing) {
             const targetVirtual = selected.adapterType === AdapterType.Virtual;
+            const targetSLCAN = selected.adapterType === AdapterType.SLCAN;
+            const targetGsUsb = selected.adapterType === AdapterType.GsUsb;
+            const targetSocketCAN = selected.adapterType === AdapterType.SocketCAN;
             const existingVirtual = existing instanceof VirtualCanAdapter;
-            const existingHw = existing instanceof SocketCanAdapter;
-            const targetHw = selected.adapterType === AdapterType.SocketCAN;
-            if ((existingVirtual && targetHw) || (existingHw && targetVirtual)) {
+            const existingSLCAN = existing instanceof SLCANCanAdapter;
+            const existingGsUsb = existing instanceof GsUsbCanAdapter;
+            const existingSocketCAN = existing instanceof SocketCanAdapter;
+            
+            // Prevent switching between virtual and hardware without explicit confirmation
+            if ((existingVirtual && (targetSLCAN || targetGsUsb || targetSocketCAN)) || 
+                ((existingSLCAN || existingGsUsb || existingSocketCAN) && targetVirtual)) {
                 const r = await vscode.window.showWarningMessage(
                     existingVirtual
                         ? 'Software virtual CAN is connected. Disconnect and connect hardware instead?'
