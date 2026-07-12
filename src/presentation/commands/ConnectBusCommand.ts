@@ -158,6 +158,30 @@ export class ConnectBusCommand {
             return;
         }
 
+        // Prompt for arbitration bitrate for hardware adapters (not virtual)
+        let bitrate = DEFAULT_BITRATE;
+        if (!isVirtual) {
+            const bitrateOptions = [
+                { label: '10000', description: '10 kbps' },
+                { label: '20000', description: '20 kbps' },
+                { label: '50000', description: '50 kbps' },
+                { label: '100000', description: '100 kbps' },
+                { label: '125000', description: '125 kbps' },
+                { label: '250000', description: '250 kbps' },
+                { label: '500000', description: '500 kbps (default)' },
+                { label: '800000', description: '800 kbps' },
+                { label: '1000000', description: '1 Mbps' },
+            ];
+            const bitrateSelection = await vscode.window.showQuickPick(bitrateOptions, {
+                placeHolder: 'Select CAN arbitration bitrate (nominal bitrate)',
+                title: 'CAN Arbitration Bitrate',
+            });
+            if (!bitrateSelection) {
+                return;
+            }
+            bitrate = parseInt(bitrateSelection.label, 10);
+        }
+
         let dataBitrate: number | undefined;
         if (!isVirtual) {
             const dataBitrateStr = await vscode.window.showInputBox({
@@ -205,7 +229,7 @@ export class ConnectBusCommand {
             const channel = new CanChannel({
                 name: channelName,
                 adapterType: selected.adapterType,
-                bitrate: DEFAULT_BITRATE,
+                bitrate,
                 dataBitrate,
             });
             await this.connectAdapter(newAdapter, channel, { silentToast: false });
