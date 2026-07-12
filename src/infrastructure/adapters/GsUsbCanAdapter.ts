@@ -5,8 +5,6 @@ import { CanFrame } from '../../core/models/bus/CanFrame';
 import type { Disposable } from '../../core/types';
 import { ConnectionError } from '../../shared/errors/ConnectionError';
 import { Logger } from '../../shared/utils/Logger';
-// @ts-ignore - usb package types are incomplete
-import USB, { Device } from 'usb';
 import {
     GS_USB_VID,
     GS_USB_PID,
@@ -64,7 +62,7 @@ import type { CanId } from '../../core/types';
  */
 export class GsUsbCanAdapter implements ICanBusAdapter {
     private _state: CanBusState = CanBusState.Disconnected;
-    private device: Device | null = null;
+    private device: any = null;
     private interfaceNumber = 0;
     private channel = 0;
     private echoIdCounter = 0;
@@ -90,8 +88,11 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
         Logger.info(`gs_usb: connecting to CANnectivity device (channel ${this.channel})`);
 
         try {
+            // Lazy import to avoid loading native usb module at extension activation
+            const USB = (await import('usb')).default;
+
             // Find and open USB device
-            await this.openUsbDevice();
+            await this.openUsbDevice(USB);
 
             // Configure device
             await this.configureDevice(channel.bitrate, channel.dataBitrate);
@@ -108,11 +109,11 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
         }
     }
 
-    private async openUsbDevice(): Promise<void> {
+private async openUsbDevice(USB: any): Promise<void> {
         // Find CANnectivity device by VID/PID
         const devices = USB.getDeviceList();
         const targetDevice = devices.find(
-            (d) => d.deviceDescriptor.idVendor === GS_USB_VID && d.deviceDescriptor.idProduct === GS_USB_PID
+            (d: any) => d.deviceDescriptor.idVendor === GS_USB_VID && d.deviceDescriptor.idProduct === GS_USB_PID
         );
 
         if (!targetDevice) {

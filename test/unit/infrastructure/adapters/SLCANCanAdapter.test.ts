@@ -9,8 +9,8 @@ suite('SLCANCanAdapter', () => {
         assert.ok(supportedTypes.includes(AdapterType.SLCAN), 'SLCAN should be in supported types');
     });
 
-    test('AdapterFactory.create returns SLCANCanAdapter instance', () => {
-        const adapter = AdapterFactory.create(AdapterType.SLCAN);
+    test('AdapterFactory.create returns SLCANCanAdapter instance', async () => {
+        const adapter = await AdapterFactory.create(AdapterType.SLCAN);
         assert.ok(adapter instanceof SLCANCanAdapter, 'Should create SLCANCanAdapter instance');
     });
 

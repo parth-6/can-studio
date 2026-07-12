@@ -5,7 +5,6 @@ import { CanFrame } from '../../core/models/bus/CanFrame';
 import type { Disposable } from '../../core/types';
 import { ConnectionError } from '../../shared/errors/ConnectionError';
 import { Logger } from '../../shared/utils/Logger';
-import SerialPort from 'serialport';
 
 /**
  * SLCAN (Serial Line CAN) adapter for USB-to-CAN devices on Windows/Linux.
@@ -20,7 +19,7 @@ import SerialPort from 'serialport';
  */
 export class SLCANCanAdapter implements ICanBusAdapter {
     private _state: CanBusState = CanBusState.Disconnected;
-    private port: SerialPort | null = null;
+    private port: any = null;
     private frameCallbacks = new Set<(frame: CanFrame) => void>();
     private stateCallbacks = new Set<(state: CanBusState) => void>();
     private errorCallbacks = new Set<(error: Error) => void>();
@@ -41,8 +40,12 @@ export class SLCANCanAdapter implements ICanBusAdapter {
         Logger.info(`SLCAN: connecting to ${channel.name} at ${channel.bitrate} bps`);
 
         try {
+            // Lazy import to avoid loading native serialport module at extension activation
+            const { SerialPort } = await import('serialport');
+
             // Open serial port
-            this.port = new SerialPort(channel.name, {
+            this.port = new SerialPort({
+                path: channel.name,
                 baudRate: 115200,   // SLCAN typically uses 115200 baud for the serial link
                 dataBits: 8,
                 stopBits: 1,

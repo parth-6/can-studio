@@ -201,7 +201,7 @@ export class ConnectBusCommand {
         }
 
         try {
-            const newAdapter = AdapterFactory.create(selected.adapterType);
+            const newAdapter = await AdapterFactory.create(selected.adapterType);
             const channel = new CanChannel({
                 name: channelName,
                 adapterType: selected.adapterType,

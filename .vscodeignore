@@ -1,3 +1,5 @@
+# Don't exclude node_modules - let vsce walk the full dependency tree
+# Only exclude dev-only folders
 .vscode/**
 .vscode-test/**
 out/test/**

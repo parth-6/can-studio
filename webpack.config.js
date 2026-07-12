@@ -22,6 +22,7 @@ const extensionConfig = {
     vscode: 'commonjs vscode',
     serialport: 'commonjs serialport',
     '@serialport/bindings': 'commonjs @serialport/bindings',
+    usb: 'commonjs usb',
   },
   resolve: {
     extensions: ['.ts', '.js'],
@@ -43,10 +44,6 @@ const extensionConfig = {
             loader: 'ts-loader',
           },
         ],
-      },
-      {
-        test: /\.node$/,
-        use: 'node-loader',
       },
     ],
   },

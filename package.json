@@ -39,6 +39,18 @@
   ],
   "icon": "resources/can-studio-logo.png",
   "main": "./dist/extension.js",
+  "activationEvents": [
+    "onCommand:can-studio.openDatabase",
+    "onCommand:can-studio.connectBus",
+    "onCommand:can-studio.disconnectBus",
+    "onCommand:can-studio.startMonitor",
+    "onCommand:can-studio.stopMonitor",
+    "onCommand:can-studio.transmitMessage",
+    "onCommand:can-studio.openSignalLab",
+    "onCommand:can-studio.closeSignalLab",
+    "onCustomEditor:can-studio.canDatabaseEditor",
+    "onView:can-studio.canDatabaseExplorer"
+  ],
   "contributes": {
     "languages": [
       {
@@ -143,12 +155,20 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
     "build:webview": "npm run build --prefix webview-ui",
     "compile": "npm run build:webview && webpack",
     "watch": "webpack --watch",
+    "rebuild:native": "electron-rebuild -f -w usb,@serialport/bindings-cpp -v 30.5.1 --msvs_version=2022",
     "package": "npm run build:webview && webpack --mode production --devtool hidden-source-map",
+    "package:prod": "npm run build:webview && npm run webpack:prod",
+    "webpack:prod": "webpack --mode production --devtool hidden-source-map",
     "vsix": "vsce package",
+    "install:dev": "npm install",
+    "install:prod": "npm install --omit=dev",
+    "clean": "rmdir /s /q node_modules 2>nul || true",
+    "prepare:dev": "npm run clean && npm run install:dev",
+    "prepare:prod": "npm run clean && npm run install:prod",
+    "package:full": "npm run prepare:dev && npm run package && npm run vsix && npm run prepare:prod",
     "compile-tests": "tsc -p ./tsconfig.test.json --outDir out",
     "watch-tests": "tsc -p ./tsconfig.test.json -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
@@ -161,7 +181,7 @@
     "test:integration": "npm run compile && npm run compile-tests && cross-env VSCODE_TEST_FILES=out/test/integration/**/*.test.js vscode-test"
   },
   "devDependencies": {
-    "@electron/rebuild": "^4.2.0",
+    "@electron/rebuild": "^3.7.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@types/vscode": "^1.110.0",
@@ -169,10 +189,8 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.7.1",
     "cross-env": "^7.0.3",
-    "electron": "^42.2.0",
     "eslint": "^9.39.2",
     "mocha": "^11.3.0",
-    "node-loader": "^2.1.0",
     "prettier": "^3.8.1",
     "prettier-plugin-svelte": "^3.5.1",
     "ts-loader": "^9.5.4",
@@ -182,10 +200,8 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "@serialport/bindings": "^10.0.1",
     "@types/serialport": "^8.0.5",
-    "@types/usb": "^2.0.4",
-    "serialport": "^9.2.8",
-    "usb": "^3.0.1"
-  }
+    "serialport": "^13.0.0"
+  },
+  "bundledDependencies": ["serialport", "@serialport/bindings-cpp", "usb"]
 }

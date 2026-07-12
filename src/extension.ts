@@ -30,8 +30,6 @@ import { CanDatabaseTreeProvider } from './presentation/views/treeview/CanDataba
 // import { SignalLabSidebarTreeProvider } from './presentation/views/treeview/SignalLabSidebarTreeProvider';
 import { WebviewMessageHandler } from './presentation/webview/WebviewMessageHandler';
 import { VirtualCanAdapter } from './infrastructure/adapters/VirtualCanAdapter';
-import { SLCANCanAdapter } from './infrastructure/adapters/SLCANCanAdapter';
-import { GsUsbCanAdapter } from './infrastructure/adapters/GsUsbCanAdapter';
 import { AdapterFactory } from './infrastructure/adapters/AdapterFactory';
 import { AdapterType } from './core/enums/AdapterType';
 import { Commands } from './shared/constants';
@@ -62,12 +60,6 @@ export function activate(context: vscode.ExtensionContext): void {
     // ── Presentation: commands ──────────────────────────────────────────────
     const commandRegistrar = new CommandRegistrar(databaseService, eventBus);
     context.subscriptions.push(...commandRegistrar.registerAll());
-
-    // Register SLCAN adapter for Windows USB-to-CAN devices
-    AdapterFactory.register(AdapterType.SLCAN, () => new SLCANCanAdapter());
-
-    // Register GsUsb adapter for CANnectivity devices
-    AdapterFactory.register(AdapterType.GsUsb, () => new GsUsbCanAdapter());
 
     const virtualBusSimulationService = new VirtualBusSimulationService(
         () => databaseService.getDatabaseForBus(),
