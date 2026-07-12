@@ -4,6 +4,31 @@ All notable changes to the **can-studio** extension are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-07-12
+
+### 🎉 Major Changes
+- **Renamed** from `candb-studio` → `can-studio` (package ID, display name, commands, settings)
+- **Windows USB-to-CAN support** via gs_usb protocol (CANnectivity, CANable, Lawicel devices)
+- **SLCAN/Serial CAN adapter** support
+
+### ✨ New Features
+- `GsUsbCanAdapter` - Full gs_usb protocol implementation (control transfers, bulk endpoints, CAN 2.0 + CAN FD)
+- `SLCANCanAdapter` - Serial Line CAN adapter support
+- Adapter factory registration for `AdapterType.GsUsb` and `AdapterType.Slcan`
+- Connect Bus command prompts for COM port when gs_usb/SLCAN selected
+- Signal Lab UI integration for hardware adapters
+
+### 🔧 Technical Fixes
+- Pinned `serialport@9.2.8` for Electron/Windows compatibility
+- Added `node-loader` webpack config for native `.node` modules
+- Fixed TypeScript types for `usb` package (`src/types/usb.d.ts`)
+- Rebuilt native modules (`@serialport/bindings`, `@node-usb/usb-win32-x64-msvc`) for Node.js 24
+
+### 📦 Installation
+```bash
+code --install-extension can-studio-0.2.0.vsix
+```
+
 ## [0.2.0] - 2026-04-11
 
 ### Added

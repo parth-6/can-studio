@@ -93,7 +93,7 @@
       <div class="status-message">
         <p class="status-lead">Not connected to a CAN adapter.</p>
         <p class="status-detail">
-          Use the status bar or <strong>CANdb Studio: Connect to CAN Bus</strong>.
+          Use the status bar or <strong>CAN Studio: Connect to CAN Bus</strong>.
         </p>
         <p class="status-meta">State: {$connectionStore.state}</p>
       </div>
@@ -160,7 +160,7 @@
       <div class="status-message">
         <p class="status-lead">Not connected to a CAN adapter.</p>
         <p class="status-detail">
-          Use the status bar or <strong>CANdb Studio: Connect to CAN Bus</strong>.
+          Use the status bar or <strong>CAN Studio: Connect to CAN Bus</strong>.
         </p>
         <p class="status-meta">State: {$connectionStore.state}</p>
       </div>
