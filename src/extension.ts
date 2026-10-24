@@ -64,10 +64,9 @@ export function activate(context: vscode.ExtensionContext): void {
     // Register SLCAN adapter for Windows USB-to-CAN devices.
     // Loaded lazily so a missing/mismatched `serialport` native binary only
     // breaks this adapter, not the whole extension.
-    AdapterFactory.register(AdapterType.SLCAN, () => {
+    AdapterFactory.register(AdapterType.SLCAN, async () => {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const { SLCANCanAdapter } = require('./infrastructure/adapters/SLCANCanAdapter');
+            const { SLCANCanAdapter } = await import('./infrastructure/adapters/SLCANCanAdapter');
             return new SLCANCanAdapter();
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -81,10 +80,9 @@ export function activate(context: vscode.ExtensionContext): void {
     // Register GsUsb adapter for CANnectivity devices.
     // Loaded lazily so a missing/mismatched `usb` native binary only breaks
     // this adapter, not the whole extension.
-    AdapterFactory.register(AdapterType.GsUsb, () => {
+    AdapterFactory.register(AdapterType.GsUsb, async () => {
         try {
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
-            const { GsUsbCanAdapter } = require('./infrastructure/adapters/GsUsbCanAdapter');
+            const { GsUsbCanAdapter } = await import('./infrastructure/adapters/GsUsbCanAdapter');
             return new GsUsbCanAdapter();
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);

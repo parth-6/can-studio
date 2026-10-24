@@ -156,40 +156,83 @@ export class ConnectBusCommand {
 
         // Prompt for arbitration bitrate for hardware adapters (not virtual)
         let bitrate = DEFAULT_BITRATE;
-        if (!isVirtual) {
-            const bitrateOptions = [
-                { label: '10000', description: '10 kbps' },
-                { label: '20000', description: '20 kbps' },
-                { label: '50000', description: '50 kbps' },
-                { label: '100000', description: '100 kbps' },
-                { label: '125000', description: '125 kbps' },
-                { label: '250000', description: '250 kbps' },
-                { label: '500000', description: '500 kbps (default)' },
-                { label: '800000', description: '800 kbps' },
-                { label: '1000000', description: '1 Mbps' },
-            ];
-            const bitrateSelection = await vscode.window.showQuickPick(bitrateOptions, {
-                placeHolder: 'Select CAN arbitration bitrate (nominal bitrate)',
-                title: 'CAN Arbitration Bitrate',
-            });
-            if (!bitrateSelection) {
-                return;
-            }
-            bitrate = parseInt(bitrateSelection.label, 10);
-        }
-
         let dataBitrate: number | undefined;
         if (!isVirtual) {
-            const dataBitrateStr = await vscode.window.showInputBox({
-                prompt: 'CAN FD data bitrate in bps (leave empty for classic CAN / no BRS)',
-                placeHolder: '2000000',
-                validateInput: (v) =>
-                    !v || /^\d+$/.test(v) ? null : 'Enter a positive integer or leave empty',
+            // First, ask user how they want to configure bitrates
+            const configMode = await vscode.window.showQuickPick([
+                { label: 'Use predefined list', description: 'Select from common CAN bitrates (dropdown)' },
+                { label: 'Enter custom values', description: 'Manually enter arbitration and data bitrates' },
+            ], {
+                placeHolder: 'Choose how to configure CAN bitrates',
+                title: 'CAN Bitrate Configuration',
             });
-            if (dataBitrateStr === undefined) {
+            if (!configMode) {
                 return;
             }
-            dataBitrate = dataBitrateStr ? parseInt(dataBitrateStr, 10) : undefined;
+
+            if (configMode.label === 'Use predefined list') {
+                // Predefined dropdown for arbitration bitrate
+                const bitrateOptions = [
+                    { label: '10000', description: '10 kbps' },
+                    { label: '20000', description: '20 kbps' },
+                    { label: '50000', description: '50 kbps' },
+                    { label: '100000', description: '100 kbps' },
+                    { label: '125000', description: '125 kbps' },
+                    { label: '250000', description: '250 kbps' },
+                    { label: '500000', description: '500 kbps (default)' },
+                    { label: '800000', description: '800 kbps' },
+                    { label: '1000000', description: '1 Mbps' },
+                ];
+                const bitrateSelection = await vscode.window.showQuickPick(bitrateOptions, {
+                    placeHolder: 'Select CAN arbitration bitrate (nominal bitrate)',
+                    title: 'CAN Arbitration Bitrate',
+                });
+                if (!bitrateSelection) {
+                    return;
+                }
+                bitrate = parseInt(bitrateSelection.label, 10);
+
+                // Data bitrate dropdown (optional)
+                const dataBitrateOptions = [
+                    { label: '', description: 'Classic CAN (no BRS / no data phase)' },
+                    { label: '1000000', description: '1 Mbps' },
+                    { label: '2000000', description: '2 Mbps' },
+                    { label: '4000000', description: '4 Mbps' },
+                    { label: '5000000', description: '5 Mbps' },
+                    { label: '8000000', description: '8 Mbps' },
+                ];
+                const dataBitrateSelection = await vscode.window.showQuickPick(dataBitrateOptions, {
+                    placeHolder: 'Select CAN FD data bitrate (optional, for BRS)',
+                    title: 'CAN FD Data Bitrate',
+                });
+                if (dataBitrateSelection === undefined) {
+                    return;
+                }
+                dataBitrate = dataBitrateSelection.label ? parseInt(dataBitrateSelection.label, 10) : undefined;
+            } else {
+                // Custom manual entry for both arbitration and data bitrate
+                const arbitrationStr = await vscode.window.showInputBox({
+                    prompt: 'Enter CAN arbitration bitrate in bps (nominal bitrate)',
+                    placeHolder: '500000',
+                    validateInput: (v) =>
+                        !v || /^\d+$/.test(v) ? null : 'Enter a positive integer (e.g., 500000)',
+                });
+                if (arbitrationStr === undefined) {
+                    return;
+                }
+                bitrate = parseInt(arbitrationStr, 10);
+
+                const dataBitrateStr = await vscode.window.showInputBox({
+                    prompt: 'Enter CAN FD data bitrate in bps (leave empty for classic CAN / no BRS)',
+                    placeHolder: '2000000',
+                    validateInput: (v) =>
+                        !v || /^\d+$/.test(v) ? null : 'Enter a positive integer or leave empty',
+                });
+                if (dataBitrateStr === undefined) {
+                    return;
+                }
+                dataBitrate = dataBitrateStr ? parseInt(dataBitrateStr, 10) : undefined;
+            }
         }
 
         const existing = this.adapter;
@@ -223,7 +266,7 @@ export class ConnectBusCommand {
         }
 
         try {
-            const newAdapter = AdapterFactory.create(selected.adapterType);
+            const newAdapter = await AdapterFactory.create(selected.adapterType);
             const channel = new CanChannel({
                 name: channelName,
                 adapterType: selected.adapterType,
