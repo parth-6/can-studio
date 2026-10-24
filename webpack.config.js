@@ -21,7 +21,8 @@ const extensionConfig = {
   externals: {
     vscode: 'commonjs vscode',
     serialport: 'commonjs serialport',
-    '@serialport/bindings': 'commonjs @serialport/bindings',
+    '@serialport/bindings-cpp': 'commonjs @serialport/bindings-cpp',
+    usb: 'commonjs usb',
   },
   resolve: {
     extensions: ['.ts', '.js'],

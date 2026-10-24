@@ -1,4 +1,5 @@
 import { CanBusState } from '../../core/enums/CanBusState';
+import { AdapterType } from '../../core/enums/AdapterType';
 import type { ICanBusAdapter } from '../../core/interfaces/bus/ICanBusAdapter';
 import type { CanChannel } from '../../core/models/bus/CanChannel';
 import type { CanFrame } from '../../core/models/bus/CanFrame';
@@ -17,6 +18,10 @@ export class SocketCanAdapter implements ICanBusAdapter {
     private frameCallbacks = new Set<(frame: CanFrame) => void>();
     private stateCallbacks = new Set<(state: CanBusState) => void>();
     private errorCallbacks = new Set<(error: Error) => void>();
+
+    get adapterType(): AdapterType {
+        return AdapterType.SocketCAN;
+    }
 
     get state(): CanBusState {
         return this._state;

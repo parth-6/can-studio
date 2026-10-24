@@ -30,8 +30,6 @@ import { CanDatabaseTreeProvider } from './presentation/views/treeview/CanDataba
 // import { SignalLabSidebarTreeProvider } from './presentation/views/treeview/SignalLabSidebarTreeProvider';
 import { WebviewMessageHandler } from './presentation/webview/WebviewMessageHandler';
 import { VirtualCanAdapter } from './infrastructure/adapters/VirtualCanAdapter';
-import { SLCANCanAdapter } from './infrastructure/adapters/SLCANCanAdapter';
-import { GsUsbCanAdapter } from './infrastructure/adapters/GsUsbCanAdapter';
 import { AdapterFactory } from './infrastructure/adapters/AdapterFactory';
 import { AdapterType } from './core/enums/AdapterType';
 import { Commands } from './shared/constants';
@@ -63,11 +61,39 @@ export function activate(context: vscode.ExtensionContext): void {
     const commandRegistrar = new CommandRegistrar(databaseService, eventBus);
     context.subscriptions.push(...commandRegistrar.registerAll());
 
-    // Register SLCAN adapter for Windows USB-to-CAN devices
-    AdapterFactory.register(AdapterType.SLCAN, () => new SLCANCanAdapter());
+    // Register SLCAN adapter for Windows USB-to-CAN devices.
+    // Loaded lazily so a missing/mismatched `serialport` native binary only
+    // breaks this adapter, not the whole extension.
+    AdapterFactory.register(AdapterType.SLCAN, () => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { SLCANCanAdapter } = require('./infrastructure/adapters/SLCANCanAdapter');
+            return new SLCANCanAdapter();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            Logger.error(`Failed to load SLCAN adapter: ${msg}`);
+            throw new Error(
+                `SLCAN adapter unavailable (native serialport dependency failed to load): ${msg}`,
+            );
+        }
+    });
 
-    // Register GsUsb adapter for CANnectivity devices
-    AdapterFactory.register(AdapterType.GsUsb, () => new GsUsbCanAdapter());
+    // Register GsUsb adapter for CANnectivity devices.
+    // Loaded lazily so a missing/mismatched `usb` native binary only breaks
+    // this adapter, not the whole extension.
+    AdapterFactory.register(AdapterType.GsUsb, () => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { GsUsbCanAdapter } = require('./infrastructure/adapters/GsUsbCanAdapter');
+            return new GsUsbCanAdapter();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            Logger.error(`Failed to load GS-USB adapter: ${msg}`);
+            throw new Error(
+                `GS-USB adapter unavailable (native usb dependency failed to load): ${msg}`,
+            );
+        }
+    });
 
     const virtualBusSimulationService = new VirtualBusSimulationService(
         () => databaseService.getDatabaseForBus(),
@@ -109,8 +135,8 @@ export function activate(context: vscode.ExtensionContext): void {
     connectCommand.onAdapterConnected((adapter) => {
         Logger.info('Bus adapter connected — creating MonitorService and TransmitService');
 
-        if (adapter instanceof VirtualCanAdapter) {
-            virtualBusSimulationService.setSimulationAdapter(adapter);
+        if (adapter.adapterType === AdapterType.Virtual) {
+            virtualBusSimulationService.setSimulationAdapter(adapter as VirtualCanAdapter);
         } else {
             virtualBusSimulationService.setSimulationAdapter(null);
         }

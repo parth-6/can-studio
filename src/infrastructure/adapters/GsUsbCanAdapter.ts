@@ -1,4 +1,5 @@
 import { CanBusState } from '../../core/enums/CanBusState';
+import { AdapterType } from '../../core/enums/AdapterType';
 import type { ICanBusAdapter } from '../../core/interfaces/bus/ICanBusAdapter';
 import type { CanChannel } from '../../core/models/bus/CanChannel';
 import { CanFrame } from '../../core/models/bus/CanFrame';
@@ -75,6 +76,10 @@ export class GsUsbCanAdapter implements ICanBusAdapter {
     private btConst: GsUsbBtConst | null = null;
     private btConstExt: GsUsbBtConstExt | null = null;
     private deviceConfig: GsUsbDeviceConfig | null = null;
+
+    get adapterType(): AdapterType {
+        return AdapterType.GsUsb;
+    }
 
     get state(): CanBusState {
         return this._state;

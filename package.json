@@ -11,6 +11,18 @@
   "engines": {
     "vscode": "^1.110.0"
   },
+  "activationEvents": [
+    "onCommand:can-studio.openDatabase",
+    "onCommand:can-studio.openSignalLab",
+    "onCommand:can-studio.closeSignalLab",
+    "onCommand:can-studio.connectBus",
+    "onCommand:can-studio.disconnectBus",
+    "onCommand:can-studio.startMonitor",
+    "onCommand:can-studio.stopMonitor",
+    "onCommand:can-studio.transmitMessage",
+    "onCustomEditor:can-studio.canDatabaseEditor",
+    "onView:can-studio.canDatabaseExplorer"
+  ],
   "bugs": {
     "url": "https://github.com/parth-6/can-studio/issues"
   },
@@ -147,7 +159,8 @@
     "build:webview": "npm run build --prefix webview-ui",
     "compile": "npm run build:webview && webpack",
     "watch": "webpack --watch",
-    "package": "npm run build:webview && webpack --mode production --devtool hidden-source-map",
+    "rebuild:native": "echo 'Skipping electron-rebuild: usb and @serialport/bindings-cpp are N-API/prebuildify packages with prebuilt binaries for all platforms'",
+    "package": "npm run build:webview && npm run rebuild:native && webpack --mode production --devtool hidden-source-map",
     "vsix": "vsce package",
     "compile-tests": "tsc -p ./tsconfig.test.json --outDir out",
     "watch-tests": "tsc -p ./tsconfig.test.json -w --outDir out",
@@ -182,10 +195,13 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
-    "@serialport/bindings": "^10.0.1",
-    "@types/serialport": "^8.0.5",
+    "@serialport/bindings-cpp": "^13.0.1",
     "@types/usb": "^2.0.4",
-    "serialport": "^9.2.8",
+    "serialport": "^13.0.0",
     "usb": "^3.0.1"
+  },
+  "allowScripts": {
+    "@serialport/bindings-cpp@13.0.1": true,
+    "@serialport/bindings-cpp@13.0.0": true
   }
 }

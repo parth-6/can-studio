@@ -4,7 +4,10 @@ import { AdapterFactory } from '../../../../src/infrastructure/adapters/AdapterF
 import { SLCANCanAdapter } from '../../../../src/infrastructure/adapters/SLCANCanAdapter';
 
 suite('SLCANCanAdapter', () => {
-    test('SLCAN adapter is registered in AdapterFactory', () => {
+    test('SLCAN adapter is registered in AdapterFactory after create', () => {
+        // SLCAN is lazily registered on first create() because it depends on
+        // the native `serialport` addon. Trigger registration, then verify.
+        AdapterFactory.create(AdapterType.SLCAN);
         const supportedTypes = AdapterFactory.getSupportedTypes();
         assert.ok(supportedTypes.includes(AdapterType.SLCAN), 'SLCAN should be in supported types');
     });
@@ -27,5 +30,10 @@ suite('SLCANCanAdapter', () => {
         assert.ok(typeof adapter.onFrameReceived === 'function');
         assert.ok(typeof adapter.onStateChanged === 'function');
         assert.ok(typeof adapter.onError === 'function');
+    });
+
+    test('SLCANCanAdapter reports adapterType as SLCAN', () => {
+        const adapter = new SLCANCanAdapter();
+        assert.strictEqual(adapter.adapterType, AdapterType.SLCAN);
     });
 });

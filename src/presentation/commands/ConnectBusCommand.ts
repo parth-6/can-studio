@@ -5,10 +5,6 @@ import { CanBusState } from '../../core/enums/CanBusState';
 import type { ICanBusAdapter } from '../../core/interfaces/bus/ICanBusAdapter';
 import { CanChannel } from '../../core/models/bus/CanChannel';
 import { AdapterFactory } from '../../infrastructure/adapters/AdapterFactory';
-import { SocketCanAdapter } from '../../infrastructure/adapters/SocketCanAdapter';
-import { SLCANCanAdapter } from '../../infrastructure/adapters/SLCANCanAdapter';
-import { GsUsbCanAdapter } from '../../infrastructure/adapters/GsUsbCanAdapter';
-import { VirtualCanAdapter } from '../../infrastructure/adapters/VirtualCanAdapter';
 import { Commands, DEFAULT_BITRATE } from '../../shared/constants';
 import type { EventBus } from '../../shared/events/EventBus';
 import { Logger } from '../../shared/utils/Logger';
@@ -178,10 +174,12 @@ export class ConnectBusCommand {
             const targetSLCAN = selected.adapterType === AdapterType.SLCAN;
             const targetGsUsb = selected.adapterType === AdapterType.GsUsb;
             const targetSocketCAN = selected.adapterType === AdapterType.SocketCAN;
-            const existingVirtual = existing instanceof VirtualCanAdapter;
-            const existingSLCAN = existing instanceof SLCANCanAdapter;
-            const existingGsUsb = existing instanceof GsUsbCanAdapter;
-            const existingSocketCAN = existing instanceof SocketCanAdapter;
+            // Use the adapter's self-reported type tag instead of `instanceof`
+            // so native-addon-backed adapters need not be imported at load time.
+            const existingVirtual = existing.adapterType === AdapterType.Virtual;
+            const existingSLCAN = existing.adapterType === AdapterType.SLCAN;
+            const existingGsUsb = existing.adapterType === AdapterType.GsUsb;
+            const existingSocketCAN = existing.adapterType === AdapterType.SocketCAN;
             
             // Prevent switching between virtual and hardware without explicit confirmation
             if ((existingVirtual && (targetSLCAN || targetGsUsb || targetSocketCAN)) || 

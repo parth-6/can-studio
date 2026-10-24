@@ -1,4 +1,5 @@
 import { CanBusState } from '../../enums/CanBusState';
+import { AdapterType } from '../../enums/AdapterType';
 import { CanChannel } from '../../models/bus/CanChannel';
 import { CanFrame } from '../../models/bus/CanFrame';
 import type { Disposable } from '../../types';
@@ -13,6 +14,9 @@ import type { Disposable } from '../../types';
 export interface ICanBusAdapter {
     /** Current connection state. */
     readonly state: CanBusState;
+
+    /** The adapter backend type this instance represents. */
+    readonly adapterType: AdapterType;
 
     /** Open a connection to the specified CAN channel. */
     connect(channel: CanChannel): Promise<void>;

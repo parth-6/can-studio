@@ -10,6 +10,7 @@ import type { ISignalDecoder } from '../../../../src/core/interfaces/bus/ISignal
 import type { CanChannel } from '../../../../src/core/models/bus/CanChannel';
 import type { Disposable } from '../../../../src/core/types';
 import { CanBusState } from '../../../../src/core/enums/CanBusState';
+import { AdapterType } from '../../../../src/core/enums/AdapterType';
 import { ByteOrder } from '../../../../src/core/enums/ByteOrder';
 
 /** Minimal CAN bus adapter that allows test code to push frames. */
@@ -17,6 +18,7 @@ function makeAdapter(): ICanBusAdapter & { pushFrame(frame: CanFrame): void } {
   const frameCallbacks = new Set<(frame: CanFrame) => void>();
   return {
     get state() { return CanBusState.Connected; },
+    adapterType: AdapterType.Virtual,
     async connect(_ch: CanChannel) {},
     async disconnect() {},
     async send(_f: CanFrame) {},

@@ -1,11 +1,12 @@
 import { CanBusState } from '../../core/enums/CanBusState';
+import { AdapterType } from '../../core/enums/AdapterType';
 import type { ICanBusAdapter } from '../../core/interfaces/bus/ICanBusAdapter';
 import type { CanChannel } from '../../core/models/bus/CanChannel';
 import { CanFrame } from '../../core/models/bus/CanFrame';
 import type { Disposable } from '../../core/types';
 import { ConnectionError } from '../../shared/errors/ConnectionError';
 import { Logger } from '../../shared/utils/Logger';
-import SerialPort from 'serialport';
+import { SerialPort } from 'serialport';
 
 /**
  * SLCAN (Serial Line CAN) adapter for USB-to-CAN devices on Windows/Linux.
@@ -27,6 +28,10 @@ export class SLCANCanAdapter implements ICanBusAdapter {
     private readBuffer = '';
     private channel: CanChannel | null = null;
 
+    get adapterType(): AdapterType {
+        return AdapterType.SLCAN;
+    }
+
     get state(): CanBusState {
         return this._state;
     }
@@ -42,7 +47,8 @@ export class SLCANCanAdapter implements ICanBusAdapter {
 
         try {
             // Open serial port
-            this.port = new SerialPort(channel.name, {
+            this.port = new SerialPort({
+                path: channel.name,
                 baudRate: 115200,   // SLCAN typically uses 115200 baud for the serial link
                 dataBits: 8,
                 stopBits: 1,
@@ -121,7 +127,7 @@ export class SLCANCanAdapter implements ICanBusAdapter {
             }
 
             const data = Buffer.from(cmd + '\r');
-            this.port.write(data, (err: Error | null | undefined, bytesWritten: number) => {
+            this.port.write(data, (err: Error | null | undefined) => {
                 if (err) {
                     reject(new ConnectionError(`Failed to send command: ${err.message}`, 'slcan'));
                 } else {

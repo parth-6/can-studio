@@ -16,9 +16,6 @@ import { TransmitTask } from '../../core/models/bus/TransmitTask';
 import type { CanDatabase } from '../../core/models/database/CanDatabase';
 import { Message } from '../../core/models/database/Message';
 import { Node } from '../../core/models/database/Node';
-import { SocketCanAdapter } from '../../infrastructure/adapters/SocketCanAdapter';
-import { SLCANCanAdapter } from '../../infrastructure/adapters/SLCANCanAdapter';
-import { GsUsbCanAdapter } from '../../infrastructure/adapters/GsUsbCanAdapter';
 import { VirtualCanAdapter } from '../../infrastructure/adapters/VirtualCanAdapter';
 import type { ConnectBusCommand } from '../commands/ConnectBusCommand';
 import { Commands, DEFAULT_BITRATE } from '../../shared/constants';
@@ -141,7 +138,7 @@ export class WebviewMessageHandler {
         if (!a) {
             return 'disconnected';
         }
-        if (a instanceof VirtualCanAdapter) {
+        if (a.adapterType === AdapterType.Virtual) {
             return 'virtual_simulation';
         }
         return 'hardware';
@@ -152,19 +149,10 @@ export class WebviewMessageHandler {
         if (!a) {
             return undefined;
         }
-        if (a instanceof VirtualCanAdapter) {
-            return AdapterType.Virtual;
-        }
-        if (a instanceof SocketCanAdapter) {
-            return AdapterType.SocketCAN;
-        }
-        if (a instanceof SLCANCanAdapter) {
-            return AdapterType.SLCAN;
-        }
-        if (a instanceof GsUsbCanAdapter) {
-            return AdapterType.GsUsb;
-        }
-        return undefined;
+        // Use the adapter's self-reported type tag instead of `instanceof`
+        // checks so that native-addon-backed adapters (SLCAN, GsUsb) do not
+        // need to be imported at module load time.
+        return a.adapterType;
     }
 
     private postSignalLabError(message: string, code?: string): void {
@@ -204,10 +192,10 @@ export class WebviewMessageHandler {
             isBrs,
         });
         try {
-            if (adapter instanceof VirtualCanAdapter) {
+            if (adapter.adapterType === AdapterType.Virtual) {
                 /** Same fingerprint path as {@link TransmitService} loopback → monitor Tx column. */
                 this.eventBus.emit('bus:frameTransmitted', frame);
-                adapter.injectFrameForMonitor(frame);
+                (adapter as VirtualCanAdapter).injectFrameForMonitor(frame);
             } else {
                 if (!this.transmitService) {
                     this.postSignalLabError('Transmit service is not ready.', 'NO_TRANSMIT');
@@ -604,7 +592,11 @@ export class WebviewMessageHandler {
 
             case 'virtualBus.start': {
                 const cur = this.connectBusCommand?.getAdapter();
-                if (cur instanceof SocketCanAdapter && cur.state === CanBusState.Connected) {
+                if (
+                    cur &&
+                    cur.adapterType !== AdapterType.Virtual &&
+                    cur.state === CanBusState.Connected
+                ) {
                     this.postSignalLabError(
                         'Disconnect hardware (status bar → Disconnect) before starting virtual simulation.',
                         'HARDWARE_ACTIVE',
@@ -612,7 +604,9 @@ export class WebviewMessageHandler {
                     break;
                 }
                 const hadAdapter =
-                    cur instanceof VirtualCanAdapter && cur.state === CanBusState.Connected;
+                    !!cur &&
+                    cur.adapterType === AdapterType.Virtual &&
+                    cur.state === CanBusState.Connected;
                 try {
                     if (!hadAdapter) {
                         const adapter = new VirtualCanAdapter();
