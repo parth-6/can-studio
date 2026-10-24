@@ -3,7 +3,11 @@
    * Vector-style payload visualization with overlap detection, hover highlight, and issue banners.
    */
   import type { MessageDescriptor, SignalDescriptor } from '../../types';
-  import { analyzeMessageLayout, getSignalLsbMsbPhysicalBits } from '../../bitLayoutUtils';
+  import {
+    analyzeMessageLayout,
+    getSignalLsbMsbPhysicalBits,
+    signalPhysicalBits,
+  } from '../../bitLayoutUtils';
 
   interface Props {
     message: MessageDescriptor;
@@ -75,12 +79,18 @@
   let gridRows = $derived.by(() => {
     const rows: (typeof analysis.cells)[] = [];
     for (let byte = 0; byte < message.dlc; byte++) {
-      rows.push(analysis.cells.slice(byte * 8, byte * 8 + 8));
+      // MSB (bit 7) on the left, LSB (bit 0) on the right ΓÇö matches the b7ΓÇªb0 header.
+      rows.push(analysis.cells.slice(byte * 8, byte * 8 + 8).reverse());
     }
     return rows;
   });
 
-  /** Overview segments — one bar per signal (may visually overlap) */
+  /** Visual column position for a physical bit ΓÇö MSB-left within each byte, matching the grid. */
+  function displayIndex(bit: number): number {
+    return Math.floor(bit / 8) * 8 + (7 - (bit % 8));
+  }
+
+  /** Overview segments ΓÇö one bar per signal (may visually overlap) */
   let overviewSegments = $derived.by(() => {
     type Seg = {
       sig: SignalDescriptor;
@@ -92,19 +102,14 @@
     const segs: Seg[] = [];
     const overlapSet = new Set(analysis.overlapBits);
     message.signals.forEach((sig, sigIdx) => {
-      const start = sig.startBit;
-      const end = sig.startBit + sig.bitLength - 1;
       if (sig.bitLength <= 0) return;
-      if (end < 0 || start >= totalBits) return;
-      const s = Math.max(0, start);
-      const e = Math.min(totalBits - 1, end);
-      let hasOverlap = false;
-      for (let b = s; b <= e; b++) {
-        if (overlapSet.has(b)) {
-          hasOverlap = true;
-          break;
-        }
-      }
+      const physical = signalPhysicalBits(sig).filter((b) => b >= 0 && b < totalBits);
+      if (physical.length === 0) return;
+      // Big-endian reads MSB-left (display index); little-endian reads LSB-left (physical index).
+      const pos = sig.byteOrder === 'little_endian' ? physical : physical.map(displayIndex);
+      const s = Math.min(...pos);
+      const e = Math.max(...pos);
+      const hasOverlap = physical.some((b) => overlapSet.has(b));
       segs.push({ sig, sigIndex: sigIdx, start: s, end: e, hasOverlap });
     });
     return segs;
@@ -133,11 +138,24 @@
     return getSignalLsbMsbPhysicalBits(sig);
   }
 
-  /** Arrow from LSB toward MSB along physical bit index (overview & LSB cell). */
+  /** Arrow from LSB toward MSB along physical bit index (overview & legend). */
   function arrowSymbol(sig: SignalDescriptor): string {
     const { lsb, msb } = lsbMsb(sig);
     if (lsb === msb) return '';
-    return lsb < msb ? '→' : '←';
+    return lsb < msb ? 'ΓåÆ' : 'ΓåÉ';
+  }
+
+  /** Grid renders MSB-left, so the LSBΓåÆMSB flow points left; big-endian's multi-byte sawtooth needs it pinned left. */
+  function displayFlowArrow(sig: SignalDescriptor): string {
+    if (sig.byteOrder === 'big_endian') return sig.bitLength > 1 ? 'ΓåÉ' : '';
+    const a = arrowSymbol(sig);
+    return a === 'ΓåÆ' ? 'ΓåÉ' : a === 'ΓåÉ' ? 'ΓåÆ' : '';
+  }
+
+  /** Overview bar reads LSBΓåÆMSB left-to-right for little-endian, right-to-left for big-endian. */
+  function overviewArrow(sig: SignalDescriptor): string {
+    if (sig.bitLength <= 1) return '';
+    return sig.byteOrder === 'little_endian' ? 'ΓåÆ' : 'ΓåÉ';
   }
 
   /** lsb/msb tag for a grid cell when exactly one signal occupies it. */
@@ -154,7 +172,7 @@
 
   function singleSigTitle(sig: SignalDescriptor, cellBit: number): string {
     const { lsb, msb } = lsbMsb(sig);
-    return `${sig.name} · bit ${cellBit} · LSB ${lsb} · MSB ${msb}`;
+    return `${sig.name} ┬╖ bit ${cellBit} ┬╖ LSB ${lsb} ┬╖ MSB ${msb}`;
   }
 </script>
 
@@ -189,7 +207,7 @@
     {/if}
 
     <p class="hint">
-      Linear bit indices 0…(DLC×8−1). Endpoint cells show <strong>lsb</strong> /
+      Linear bit indices 0ΓÇª(DLC├ù8ΓêÆ1). Endpoint cells show <strong>lsb</strong> /
       <strong>msb</strong> (or both for a 1-bit field), then the bit index. The arrow points from LSB
       toward MSB along the bus index. Hover a signal in the legend or layout to highlight it.
     </p>
@@ -209,8 +227,8 @@
               style:background-color={colorForSignal(seg.sigIndex)}
               style:z-index={seg.sigIndex}
               title="{seg.sig
-                .name} — bits {seg.start}…{seg.end} · LSB @ {lm.lsb}, MSB @ {lm.msb}{seg.hasOverlap
-                ? ' · overlap'
+                .name} ΓÇö LSB @ {lm.lsb}, MSB @ {lm.msb}{seg.hasOverlap
+                ? ' ┬╖ overlap'
                 : ''}"
               onmouseenter={() => setHover(seg.sigIndex)}
               onmouseleave={() => setHover(null)}
@@ -219,7 +237,7 @@
               <span class="overview-inner">
                 <span class="overview-label">{seg.sig.name}</span>
                 {#if seg.sig.bitLength > 1}
-                  <span class="overview-arrow" aria-hidden="true">{arrowSymbol(seg.sig)}</span>
+                  <span class="overview-arrow" aria-hidden="true">{overviewArrow(seg.sig)}</span>
                 {/if}
               </span>
             </div>
@@ -251,7 +269,7 @@
             {@const oneSig = sigs.length === 1 ? message.signals[sigs[0]] : null}
             {@const endTag = oneSig ? cellBitEndLabel(cell.bit, oneSig) : null}
             {@const showFlowArrow =
-              oneSig && oneSig.bitLength > 1 && endTag === 'lsb' && arrowSymbol(oneSig)}
+              oneSig && oneSig.bitLength > 1 && endTag === 'lsb' && displayFlowArrow(oneSig)}
             <div
               class="bit-cell"
               class:occupied={sigs.length > 0}
@@ -263,10 +281,10 @@
               style:background={bg}
               style:opacity={sigs.length === 0 ? 1 : overlap ? 1 : 0.95}
               title={sigs.length === 0
-                ? `Bit ${cell.bit} — unallocated`
+                ? `Bit ${cell.bit} ΓÇö unallocated`
                 : sigs.length === 1 && oneSig
                   ? singleSigTitle(oneSig, cell.bit)
-                  : `Overlap: ${sigs.map((i) => message.signals[i]?.name).join(' + ')} · bit ${cell.bit}`}
+                  : `Overlap: ${sigs.map((i) => message.signals[i]?.name).join(' + ')} ┬╖ bit ${cell.bit}`}
               onmouseenter={() => (sigs.length === 1 ? setHover(sigs[0]) : setHover(null))}
               onmouseleave={() => setHover(null)}
               role="gridcell"
@@ -309,9 +327,9 @@
               {/if}
               <span class="range">
                 {#if sig.bitLength <= 1}
-                  len {sig.bitLength} · LSB/MSB @ {lsbMsb(sig).lsb}
+                  len {sig.bitLength} ┬╖ LSB/MSB @ {lsbMsb(sig).lsb}
                 {:else}
-                  len {sig.bitLength} · LSB @{lsbMsb(sig).lsb}
+                  len {sig.bitLength} ┬╖ LSB @{lsbMsb(sig).lsb}
                   {arrowSymbol(sig)} MSB @{lsbMsb(sig).msb}
                 {/if}
               </span>
